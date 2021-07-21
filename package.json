@@ -1,6 +1,6 @@
 {
   "name": "github-commit-to-trello-card",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "GitHub Action to attach GitHub commits and pull requests to a Trello card",
   "main": "dist/index.js",
   "scripts": {

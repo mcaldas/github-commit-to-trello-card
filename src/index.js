@@ -138,7 +138,7 @@ async function handleHeadCommit(data) {
   let message = data.message;
   let user = data.author.name;
   let cardsNumbers = getCardNumbersArray(message);
-  cardsNumbers.forEach(cardNumber => {
+  for (const cardNumber of cardsNumbers) {
     let card = await getCardOnBoardByNumber(trelloBoardId, cardNumber);
     if (card && card.length > 0) {
       if (trelloCardAction && trelloCardAction.toLowerCase() == 'attachment') {
@@ -154,7 +154,7 @@ async function handleHeadCommit(data) {
         await moveCardToList(trelloBoardId, card, trelloListNameCommit);
       }
     }
-  });
+  }
 }
 
 async function handlePullRequest(data) {
@@ -163,7 +163,7 @@ async function handlePullRequest(data) {
   let message = data.title;
   let user = data.user.name;
   let cardsNumbers = getCardNumbersArray(message);
-  cardsNumbers.forEach(cardNumber => {
+  for (const cardNumber of cardsNumbers) {
     let card = await getCardOnBoardByNumber(trelloBoardId, cardNumber);
     if (card && card.length > 0) {
       if (trelloCardAction && trelloCardAction.toLowerCase() == 'attachment') {
@@ -179,7 +179,7 @@ async function handlePullRequest(data) {
         await moveCardToList(trelloBoardId, card, trelloListNamePullRequestClosed);
       }
     }
-  });
+  }
 }
 
 async function run() {
