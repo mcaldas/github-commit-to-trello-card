@@ -21,7 +21,7 @@ function getCardNumber(message) {
 }
 
 function getCardNumbersArray(message) {
-  console.log(`getCardNumber(${message})`);
+  console.log(`getCardNumbersArray(${message})`);
   let ids = message && message.length > 0 ? message.replace(regexPullRequest, "").match(/\#\d+/g) : [];
   return ids && ids.length > 0 ? [...new Set(ids.map((x) => {return x.replace('#', '');}))] : null;
 }
