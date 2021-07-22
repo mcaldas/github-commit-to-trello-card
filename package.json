@@ -2,7 +2,7 @@
   "name": "github-commit-to-trello-card",
   "version": "3.0.0",
   "description": "GitHub Action to attach GitHub commits and pull requests to a Trello card",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "ncc build src/index.js -o dist",
     "test": "echo \"Error: no test specified\" && exit 1"

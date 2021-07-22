@@ -123,7 +123,11 @@ async function moveCardToList(board, card, list) {
       token: trelloAuthToken, 
       idList: listId
     }).then(response => {
-      return response && response.status == 200;
+      if(response && response.status == 200) {
+        return response;
+      } else {
+        throw new Error(`Response not 200, message: ${response}`)
+      }
     }).catch(error => {
       console.error(url, `Error ${error.response.status} ${error.response.statusText}`);
       return null;
@@ -138,20 +142,25 @@ async function handleHeadCommit(data) {
   let message = data.message;
   let user = data.author.name;
   let cardsNumbers = getCardNumbersArray(message);
-  for (const cardNumber of cardsNumbers) {
-    let card = await getCardOnBoardByNumber(trelloBoardId, cardNumber);
-    if (card && card.length > 0) {
-      if (trelloCardAction && trelloCardAction.toLowerCase() == 'attachment') {
-        await addAttachmentToCard(card, url);
-      }
-      else if (trelloCardAction && trelloCardAction.toLowerCase() == 'comment') {
-        await addCommentToCard(card, user, message, url);
-      }
-      if (message.match(regexPullRequest) && trelloListNamePullRequestClosed && trelloListNamePullRequestClosed.length > 0) {
-        await moveCardToList(trelloBoardId, card, trelloListNamePullRequestClosed);
-      }
-      else if (trelloListNameCommit && trelloListNameCommit.length > 0) {
-        await moveCardToList(trelloBoardId, card, trelloListNameCommit);
+  console.log(`Card number(s): ${cardsNumbers}`);
+  if (cardsNumbers && cardsNumbers.length > 0) {
+    for (const cardNumber of cardsNumbers) {
+      let card = await getCardOnBoardByNumber(trelloBoardId, cardNumber);
+      if (card && card.length > 0) {
+        if (trelloCardAction && trelloCardAction.toLowerCase() == 'attachment') {
+          await addAttachmentToCard(card, url);
+        }
+        else if (trelloCardAction && trelloCardAction.toLowerCase() == 'comment') {
+          await addCommentToCard(card, user, message, url);
+        }
+        if (message.match(regexPullRequest) && trelloListNamePullRequestClosed && trelloListNamePullRequestClosed.length > 0) {
+          const moveResponsePr = await moveCardToList(trelloBoardId, card, trelloListNamePullRequestClosed);
+          console.log(`handleHeadCommit PR moveResponse: ${moveResponsePr}`);
+        }
+        else if (trelloListNameCommit && trelloListNameCommit.length > 0) {
+          const moveResponseCm = await moveCardToList(trelloBoardId, card, trelloListNameCommit);
+          console.log(`handleHeadCommit moveResponse: ${moveResponseCm}`);
+        }
       }
     }
   }
@@ -163,20 +172,27 @@ async function handlePullRequest(data) {
   let message = data.title;
   let user = data.user.name;
   let cardsNumbers = getCardNumbersArray(message);
-  for (const cardNumber of cardsNumbers) {
-    let card = await getCardOnBoardByNumber(trelloBoardId, cardNumber);
-    if (card && card.length > 0) {
-      if (trelloCardAction && trelloCardAction.toLowerCase() == 'attachment') {
-        await addAttachmentToCard(card, url);
-      }
-      else if (trelloCardAction && trelloCardAction.toLowerCase() == 'comment') {
-        await addCommentToCard(card, user, message, url);
-      }
-      if (data.state == "open" && trelloListNamePullRequestOpen && trelloListNamePullRequestOpen.length > 0) {
-        await moveCardToList(trelloBoardId, card, trelloListNamePullRequestOpen);
-      }
-      else if (data.state == "closed" && trelloListNamePullRequestClosed && trelloListNamePullRequestClosed.length > 0) {
-        await moveCardToList(trelloBoardId, card, trelloListNamePullRequestClosed);
+  console.log(`Card number(s): ${cardsNumbers}`);
+  if (cardsNumbers && cardsNumbers.length > 0) {
+    for (const cardNumber of cardsNumbers) {
+      let card = await getCardOnBoardByNumber(trelloBoardId, cardNumber);
+      if (card && card.length > 0) {
+        if (trelloCardAction && trelloCardAction.toLowerCase() == 'attachment') {
+          await addAttachmentToCard(card, url);
+        }
+        else if (trelloCardAction && trelloCardAction.toLowerCase() == 'comment') {
+          let msgPrefix = '';
+          if (data.state == "open") { msgPrefix = 'Opened PR: ' }
+          if (data.state == "closed") { msgPrefix = 'Closed PR: ' }
+
+          await addCommentToCard(card, user, `${msgPrefix} ${message}`, url);
+        }
+        if (data.state == "open" && trelloListNamePullRequestOpen && trelloListNamePullRequestOpen.length > 0) {
+          await moveCardToList(trelloBoardId, card, trelloListNamePullRequestOpen);
+        }
+        else if (data.state == "closed" && trelloListNamePullRequestClosed && trelloListNamePullRequestClosed.length > 0) {
+          await moveCardToList(trelloBoardId, card, trelloListNamePullRequestClosed);
+        }
       }
     }
   }
