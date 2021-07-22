@@ -39,7 +39,7 @@ async function getCardOnBoard(board, message) {
     }).then(response => {
       return response.data.id;
     }).catch(error => {
-      console.error(url, `Error ${error.response.status} ${error.response.statusText}`);
+      console.log(url, `Error ${error.response.status} ${error.response.statusText}`);
       return null;
     });
   }
@@ -59,7 +59,7 @@ async function getCardOnBoardByNumber(board, cardNumber) {
     }).then(response => {
       return response.data.id;
     }).catch(error => {
-      console.error(url, `Error ${error.response.status} ${error.response.statusText}`);
+      console.log(url, `Error ${error.response.status} ${error.response.statusText}`);
       return null;
     });
   }
@@ -78,7 +78,7 @@ async function getListOnBoard(board, list) {
     let result = response.data.find(l => l.closed == false && l.name == list);
     return result ? result.id : null;
   }).catch(error => {
-    console.error(url, `Error ${error.response.status} ${error.response.statusText}`);
+    console.log(url, `Error ${error.response.status} ${error.response.statusText}`);
     return null;
   });
 }
@@ -93,7 +93,7 @@ async function addAttachmentToCard(card, link) {
   }).then(response => {
     return response.status == 200;
   }).catch(error => {
-    console.error(url, `Error ${error.response.status} ${error.response.statusText}`);
+    console.log(url, `Error ${error.response.status} ${error.response.statusText}`);
     return null;
   });
 }
@@ -108,7 +108,7 @@ async function addCommentToCard(card, user, message, link) {
   }).then(response => {
     return response.status == 200;
   }).catch(error => {
-    console.error(url, `Error ${error.response.status} ${error.response.statusText}`);
+    console.log(url, `Error ${error.response.status} ${error.response.statusText}`);
     return null;
   });
 }
@@ -129,8 +129,8 @@ async function moveCardToList(board, card, list) {
         throw new Error(`Response not 200, message: ${response}`)
       }
     }).catch(error => {
-      console.error(url, `Error ${error.response.status} ${error.response.statusText}`);
-      return null;
+      console.log(url, `Error ${error.response.status} ${error.response.statusText}`);
+      return error;
     });
   }       
   return null;
@@ -188,10 +188,12 @@ async function handlePullRequest(data) {
           await addCommentToCard(card, user, `${msgPrefix} ${message}`, url);
         }
         if (data.state == "open" && trelloListNamePullRequestOpen && trelloListNamePullRequestOpen.length > 0) {
-          await moveCardToList(trelloBoardId, card, trelloListNamePullRequestOpen);
+          const moveResponseOpen = await moveCardToList(trelloBoardId, card, trelloListNamePullRequestOpen);
+          console.log(`handlePullRequest moveResponseOpen: ${moveResponseOpen}`);
         }
         else if (data.state == "closed" && trelloListNamePullRequestClosed && trelloListNamePullRequestClosed.length > 0) {
-          await moveCardToList(trelloBoardId, card, trelloListNamePullRequestClosed);
+          const moveResponseClosed = await moveCardToList(trelloBoardId, card, trelloListNamePullRequestClosed);
+          console.log(`handlePullRequest moveResponseClosed: ${moveResponseClosed}`);
         }
       }
     }
