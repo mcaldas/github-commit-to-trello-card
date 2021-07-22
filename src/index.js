@@ -123,11 +123,9 @@ async function moveCardToList(board, card, list) {
       token: trelloAuthToken, 
       idList: listId
     }).then(response => {
-      if(response && response.status == 200) {
-        return response;
-      } else {
-        throw new Error(`Response not 200, message: ${response}`)
-      }
+      console.log(`Response: ${response.status} ${response.statusText}`);
+      return response && response.status == 200;
+      
     }).catch(error => {
       console.log(url, `Error ${error.response.status} ${error.response.statusText}`);
       return error;
