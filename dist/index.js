@@ -8839,6 +8839,7 @@ async function addCommentToCard(card, user, message, link) {
 async function moveCardToList(board, card, list) {
   console.log(`moveCardToList(${board}, ${card}, ${list})`);
   let listId = await getListOnBoard(board, list);
+  console.log(`moveCardToList listId: ${listId} list: ${list}`);
   if (listId && listId.length > 0) {
     let url = `https://api.trello.com/1/cards/${card}`;
     let config = {
