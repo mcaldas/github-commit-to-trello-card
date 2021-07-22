@@ -8841,12 +8841,17 @@ async function moveCardToList(board, card, list) {
   let listId = await getListOnBoard(board, list);
   if (listId && listId.length > 0) {
     let url = `https://api.trello.com/1/cards/${card}`;
+    let config = {
+      headers: {
+        Accept: 'application/json',
+      }
+    }
     return await axios__WEBPACK_IMPORTED_MODULE_0__.put(url, {
       key: trelloApiKey,
       token: trelloAuthToken, 
       idList: listId
-    }).then(response => {
-      console.log(`Response: ${response.status} ${response.statusText}`);
+    }, config).then(response => {
+      console.log(`Response: ${response.text} ${response.status} ${response.statusText}`);
       return response && response.status == 200;
       
     }).catch(error => {
